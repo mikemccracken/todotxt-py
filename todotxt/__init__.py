@@ -2,10 +2,12 @@
 
 from collections import defaultdict
 from datetime import datetime
+from functools import total_ordering
 import re
 
 DATE_FMT = "%Y-%M-%d"
 
+@total_ordering
 class TODO:
     def __init__(self, text, priority=None, created_date=None,
                  done_date=None, contexts=None, projects=None,
@@ -25,7 +27,7 @@ class TODO:
         self.projects = projects if projects else []
         self.done = done
 
-    def __str__(self):
+    def _get_str_components(self):
         d = {}
         d['donestr'] = "x {} ".format(self.done_date) if self.done_date else ""
 
@@ -37,11 +39,31 @@ class TODO:
         d['text'] = self.text
         if len(self.contexts) + len(self.projects) > 0:
             d['text'] += " "
-        d['cxstr'] = " ".join(["@{}".format(c) for c in self.contexts])
+        d['cxstr'] = " ".join(["@{}".format(c) for c in sorted(self.contexts)])
         if len(self.contexts) > 0: d['cxstr'] += " "
-        d['prjstr'] = " ".join(["+{}".format(p) for p in self.projects])
+        d['prjstr'] = " ".join(["+{}".format(p) for p in sorted(self.projects)])
         if len(self.projects) > 0: d['prjstr'] += " "
+        return d
+
+    def __str__(self):
+        d = self._get_str_components()
         return "'{donestr}'{pstr}{cdstr}{text}{prjstr}{cxstr}".format(**d)
+
+    def __eq__(self, other):
+        # depends on sorted context/project arrays
+        return str(self) == str(other)
+
+    def __lt__(self, other):
+        def get_tuple(d):
+            return (d['donestr'],
+                    d['prjstr'],
+                    d['cxstr'],
+                    d['cdstr'],
+                    d['pstr'],
+                    d['text'])
+        d_self = self._get_str_components()
+        d_other = other._get_str_components()
+        return get_tuple(d_self) < get_tuple(d_other)
 
 def todo_from_line(line):
     """returns a TODO object parsed from 'line'"""
@@ -100,6 +122,7 @@ class TODOFile:
         self.todos = []
         with open(self.filename, 'r') as f:
             self.todos += [todo_from_line(l) for l in f.readlines()]
+        self.todos = [t for t in self.todos if t is not None]
 
         self.projects = defaultdict(list)
         self.contexts = defaultdict(list)
