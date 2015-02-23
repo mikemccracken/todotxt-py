@@ -91,7 +91,7 @@ class ReviewShell(cmd.Cmd):
 
     def show_todo(self, todo):
         if todo.done:
-            print("\N{BALLOT BOX WITH X} " + str(todo))
+            print("\N{CHECK MARK} " + str(todo))
         else:
             print("\N{BALLOT BOX} " + str(todo))
 
