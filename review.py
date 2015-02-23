@@ -260,6 +260,10 @@ class ReviewShell(cmd.Cmd):
         self.move_current_to('waiting.txt')
     do_w = do_wait
 
+    def do_now(self, rest):
+        "Move current todo to todo.txt"
+        self.move_current_to('todo.txt')
+
     def do_quit(self, rest):
         "Quit"
         if self.dirty:
