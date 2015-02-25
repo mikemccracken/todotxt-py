@@ -119,12 +119,11 @@ class ReviewShell(cmd.Cmd):
         "prints next todo. returns false if at end."
         if increment:
             self.current_todo_index += 1
-        if self.current_todo_index >= len(self.current_todos):
+        while self.current_todo_index >= len(self.current_todos):
             if not self.goto_next_file():
                 return False
-            else:
-                self.show_file_info()
-                print("\n")
+            self.show_file_info()
+            print("\n")
         self.show_todo(self.current_todo)
         return True
 
