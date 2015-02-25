@@ -92,10 +92,15 @@ class ReviewShell(cmd.Cmd):
         print(instr)
 
     def show_todo(self, todo):
+        n = self.current_todos.index(todo) + 1
+        tot = len(self.current_todos)
         if todo.done:
-            print("\N{CHECK MARK} " + str(todo))
+            icon = "\N{CHECK MARK}"
         else:
-            print("\N{BALLOT BOX} " + str(todo))
+            icon = "\N{BALLOT BOX}"
+        print("{pad}{n}/{tot}\n"
+              "{pad}{icon} {todo}".format(pad=4*" ", n=n, tot=tot,
+                                          icon=icon, todo=todo))
 
     def refresh_current_todos(self):
         self.current_todos = sorted(self.current_file.get_todos())
