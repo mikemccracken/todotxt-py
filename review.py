@@ -179,6 +179,8 @@ class ReviewShell(cmd.Cmd):
                 self.current_todo.priority = None
             else:
                 self.current_todo.priority = rest.upper()
+            self.current_file.replace_todo(self.current_todo,
+                                           self.current_todo)
             self.dirty = True
         self.show_next()
 
@@ -220,6 +222,7 @@ class ReviewShell(cmd.Cmd):
             newtodo = todo_from_line(newval)
             self.current_file.replace_todo(self.current_todo,
                                            newtodo)
+            self.current_todos[self.current_todo_index] = newtodo
         self.show_next()
     do_e = do_edit
 
