@@ -169,6 +169,19 @@ class ReviewShell(cmd.Cmd):
             self.show_todo(self.current_todo)
     do_p = do_prev
 
+    def do_prio(self, rest):
+        "Set priority A-Z for current todo ('0' to clear) and go to next."
+        if (rest != '0' and not rest.isalpha()) or len(rest) != 1:
+            print("'{}' not a valid priority. Use A-Z.".format(rest))
+            return
+        if rest != self.current_todo.priority:
+            if rest == '0':
+                self.current_todo.priority = None
+            else:
+                self.current_todo.priority = rest.upper()
+            self.dirty = True
+        self.show_next()
+
     def todo_completer(self, text, idx):
         "not currently used."
         return text + 'foo'
