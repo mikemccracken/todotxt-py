@@ -59,6 +59,8 @@ class ReviewShell(cmd.Cmd):
         # get started:
         print("Welcome to your {} review!"
               " Type help or ? to list commands.\n".format(review_type))
+        print("You will be reviewing "
+              "{}\n".format(", ".join(self.to_review.keys())))
         self.show_file_info()
         print("\n")
         self.show_todo(self.current_todo)
