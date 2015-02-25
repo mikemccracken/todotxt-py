@@ -123,6 +123,13 @@ class ReviewShell(cmd.Cmd):
         self.show_todo(self.current_todo)
         return True
 
+    def show_prev(self):
+        if self.current_todo_index == 0:
+            return False
+        self.current_todo_index -= 1
+        self.show_todo(self.current_todo)
+        return True
+
     def do_where(self, rest):
         "Show current todo"
         self.show_file_info()
@@ -149,6 +156,13 @@ class ReviewShell(cmd.Cmd):
         if not self.show_next():
             print("At end of todos and files.")
     do_n = do_next
+
+    def do_prev(self, rest):
+        "Do nothing with the current todo and go to previous"
+        if not self.show_prev():
+            print("At first todo already:")
+            self.show_todo(self.current_todo)
+    do_p = do_prev
 
     def todo_completer(self, text, idx):
         "not currently used."
