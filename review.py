@@ -313,15 +313,26 @@ class ReviewShell(cmd.Cmd):
 
     def do_skipfile(self, rest):
         "Skip remaining todos in the file and move to next."
-        if self.current_file_index == len(self.to_review) - 1:
-            print("can't skip past end of files.")
+        if self.current_file_index >= len(self.to_review):
+            print("at end of files.")
             return
+
         nskip = len(self.current_todos) - self.current_todo_index
         self.show_message("Skipping {} todos in "
                           "{}.".format(nskip, self.current_file.filename))
-        self.goto_next_file()
-        self.show_file_info()
-        print("\n")
+
+        while True:
+            if not self.goto_next_file():
+                print("at end of files.")
+                return
+
+            self.show_file_info()
+            if len(self.current_todos) > 0:
+                print("\n")
+                break
+            else:
+                print("    (Skipping)\n")
+
         self.show_todo(self.current_todo)
 
     def do_save(self, rest):
