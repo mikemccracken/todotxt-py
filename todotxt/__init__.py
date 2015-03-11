@@ -7,7 +7,7 @@ import os
 import re
 import tempfile
 
-DATE_FMT = "%Y-%M-%d"
+DATE_FMT = "%Y-%m-%d"
 
 
 @total_ordering
