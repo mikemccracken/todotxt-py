@@ -22,7 +22,7 @@ if __name__ == '__main__':
         if bfn == "done.txt":
             continue
         f = TODOFile(fn)
-        print("{}: ".format(bfn), end="")
+        print("{:<18}: ".format(bfn), end="")
         archived = 0
         for todo in f.get_todos():
             if not todo.done:
