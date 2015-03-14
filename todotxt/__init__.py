@@ -52,8 +52,25 @@ class TODO:
         return d
 
     def __str__(self):
+        return self.get_string()
+
+    def get_string(self, show_done=True):
         d = self._get_str_components()
-        return "{donestr}{pstr}{cdstr}{text}{prjstr}{cxstr}".format(**d)
+        s = ""
+        if show_done:
+            s = "{donestr}".format(**d)
+        s += "{pstr}{cdstr}{text}{prjstr}{cxstr}".format(**d)
+        return s
+
+    @property
+    def projects_string(self):
+        d = self._get_str_components()
+        return d['prjstr']
+
+    @property
+    def contexts_string(self):
+        d = self._get_str_components()
+        return d['cxstr']
 
     def __eq__(self, other):
         # depends on sorted context/project arrays
