@@ -32,4 +32,26 @@ This is a simple script that shows you what got done in the last 7 days, each da
 This is a version of the todo.sh archive action that knows about files other than todo.txt.
 
 
+# shell "Integration"
 
+I have been using a ZSH prompt that displays a subset of priority "(A)" todos to help remind me of next actions. Aside from deciding what's "(A)" and thus worth staring at in the prompt until I get it done, I don't really use priorities. 
+
+Here's my huge prompt. `git_super_status` is from https://github.com/olivierverdier/zsh-git-prompt , which is nice.
+
+```
+MY_DATE="%D{%a %d %b %Y}"
+MY_TIME="%D{%H:%M:%S}"
+export PS1='%h %n@%m | ${MY_DATE} ${MY_TIME} %E | $(git_super_status)
+$(show_todos)
+%/
+%# '
+
+# set FOCUS to e.g. a context like @work or @hacking:
+function show_todos(){
+    TODOS=`grep -n "^(A).*$FOCUS" ~/Dropbox/todo/todo.txt`
+    if [ -n "$FOCUS" ]; then echo "Todos in $FOCUS:"; fi
+    if [ -n "$TODOS" ]; then
+        echo "$TODOS"
+    fi
+}
+```
