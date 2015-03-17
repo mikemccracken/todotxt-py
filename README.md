@@ -7,6 +7,8 @@ The way I work differs slightly from the standard todo.sh setup in that I am kee
 
 ## Motivation and Plans
 
+I use these scripts every day, but I will consider them a failure if I've spent too much time actually working on them instead of the things I use them to track.
+
 I'm happy to discuss these scripts and plans for their improvement, but I don't anticipate making this an active ongoing Project with all the work that implies. I will continue to update them as I use them, but may not respond to requests about them with much speed.
 
 # todotxt module and scripts
