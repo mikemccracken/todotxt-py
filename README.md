@@ -1,7 +1,7 @@
 # todotxt-py
 
 This is a loose, evolving collection of scripts for manipulating text todo lists in the [todotxt](http://todotxt.com) format.
-I currently use it along with Dropbox and Gina Trapani's (Todotxt Touch iOS app](https://itunes.apple.com/us/app/todo.txt-touch/id491342186?ls=1&mt=8), which lets me capture todos on the go.
+I currently use it along with Dropbox and Gina Trapani's [Todotxt Touch iOS app](https://itunes.apple.com/us/app/todo.txt-touch/id491342186?ls=1&mt=8), which lets me capture todos on the go.
 
 The way I work differs slightly from the standard todo.sh setup in that I am keeping separate text files for non-immediate items, called `next-week.txt` and `someday-maybe.txt`. I also keep a `waiting.txt` for things I need to track but aren't currently in my court.
 
