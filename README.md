@@ -55,3 +55,13 @@ function show_todos(){
     fi
 }
 ```
+
+it ends up looking like this:
+```
+10137 mmccrack@mba | Mon 16 Mar 2015 22:15:57  | 
+Todos in computer:
+11:(A) back up SD card @computer
+12:(A) check on amazon gift card balance again @computer
+/Users/mmccrack/todotxt
+% 
+```
