@@ -9,6 +9,12 @@ from todotxt import TODOFile, todo_from_line
 
 
 if __name__ == '__main__':
+
+    # todo.sh usage:
+    if len(sys.argv) > 1 and sys.argv[1] == 'usage':
+        print("USAGE: archive --dir=todo_dir")
+        sys.exit()
+
     parser = argparse.ArgumentParser(description='todotxt archive script')
     parser.add_argument('--dir', default=os.environ.get('TODO_DIR', '.'),
                         help="Directory to look for todo.txt files")

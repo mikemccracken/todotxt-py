@@ -6,6 +6,7 @@ from collections import OrderedDict
 from glob import glob
 import os
 import readline
+import sys
 
 readline.parse_and_bind("TAB: complete")
 
@@ -355,6 +356,11 @@ class ReviewShell(cmd.Cmd):
 
 
 if __name__ == '__main__':
+    # todo.sh usage:
+    if len(sys.argv) > 1 and sys.argv[1] == 'usage':
+        print("USAGE: review script. use -h for real usage")
+        sys.exit()
+
     parser = argparse.ArgumentParser(description='todotxt review script')
     parser.add_argument('--dir', default=os.environ.get('TODO_DIR', '.'),
                         help="Directory to look for todo.txt files")
