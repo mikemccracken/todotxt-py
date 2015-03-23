@@ -8,19 +8,20 @@ import re
 import tempfile
 
 DATE_FMT = "%Y-%m-%d"
+TIME_FMT = "%X"
 
 
 @total_ordering
 class TODO:
     def __init__(self, text, priority=None, created_date=None,
                  done_date=None, contexts=None, projects=None,
-                 done=False):
+                 hashtags=None, done=False):
         """Initialize a TODO object with none of the chars from the parsed
         version, like @+#.
 
         _date args are strings
 
-        contexts and projects are lists
+        contexts, projects and hashtags are lists
         """
         self.text = text
         self.priority = priority
@@ -28,6 +29,7 @@ class TODO:
         self.done_date = done_date
         self.contexts = contexts if contexts else []
         self.projects = projects if projects else []
+        self.hashtags = hashtags if hashtags else []
 
     def _get_str_components(self):
         d = {}
@@ -38,9 +40,11 @@ class TODO:
         else:
             d['pstr'] = ""
         d['cdstr'] = (self.created_date + " ") if self.created_date else ""
+
         d['text'] = self.text
-        if len(self.contexts) + len(self.projects) > 0:
+        if len(self.contexts) + len(self.projects) + len(self.hashtags) > 0:
             d['text'] += " "
+
         d['cxstr'] = " ".join(["@{}".format(c)
                                for c in sorted(self.contexts)])
         if len(self.contexts) > 0:
@@ -49,17 +53,25 @@ class TODO:
                                 for p in sorted(self.projects)])
         if len(self.projects) > 0:
             d['prjstr'] += " "
+
+        d['htstr'] = " ".join(["#{}".format(p)
+                                for p in sorted(self.hashtags)])
+        if len(self.hashtags) > 0:
+            d['htstr'] += " "
+
         return d
 
     def __str__(self):
         return self.get_string()
 
-    def get_string(self, show_done=True):
+    def get_string(self, show_done=True, show_tags=True):
         d = self._get_str_components()
         s = ""
         if show_done:
             s = "{donestr}".format(**d)
-        s += "{pstr}{cdstr}{text}{prjstr}{cxstr}".format(**d)
+        if not show_tags:
+            d['htstr'] = ''
+        s += "{pstr}{cdstr}{text}{prjstr}{cxstr}{htstr}".format(**d)
         return s
 
     @property
@@ -72,6 +84,11 @@ class TODO:
         d = self._get_str_components()
         return d['cxstr']
 
+    @property
+    def hashtags_string(self):
+        d = self._get_str_components()
+        return d['htstr']
+
     def __eq__(self, other):
         # depends on sorted context/project arrays
         return str(self) == str(other)
@@ -83,13 +100,30 @@ class TODO:
     @done.setter
     def done(self, newval):
         if newval:
-            self.done_date = datetime.strftime(datetime.now(), DATE_FMT)
+            now = datetime.now()
+            self.done_date = datetime.strftime(now, DATE_FMT)
+            timestr = datetime.strftime(now, TIME_FMT)
+            self.hashtags.append("done-{}".format(timestr))
         else:
             self.done_date = None
+
+    @property
+    def done_datetime(self):
+        "returns a datetime instance if the 'done-<TIME>' hashtag exists"
+        if not self.done:
+            return None
+        for ht in self.hashtags:
+            if ht.startswith("done-"):
+                return datetime.strptime("{} {}".format(self.done_date,
+                                                        ht[5:]),
+                                         "{} {}".format(DATE_FMT, TIME_FMT))
+
+        return datetime.strptime(self.done_date, DATE_FMT)
 
     def __lt__(self, other):
         def get_tuple(d):
             return (d['donestr'],
+                    d['htstr'],
                     d['prjstr'],
                     d['cxstr'],
                     d['cdstr'],
@@ -108,7 +142,6 @@ def todo_from_line(line):
     if len(words) == 0:
         return None
 
-    # TODO: not handling done correctly
     t_done = False
     t_done_date = None
     if words[0][0] == 'x':
@@ -134,12 +167,15 @@ def todo_from_line(line):
 
     t_projects = []
     t_contexts = []
+    t_hashtags = []
     t_txt = []
     for word in words:
         if word.startswith("+"):
             t_projects.append(word[1:])
         elif word.startswith("@"):
             t_contexts.append(word[1:])
+        elif word.startswith("#"):
+            t_hashtags.append(word[1:])
         else:
             t_txt.append(word)
     t_txt = " ".join(t_txt)
@@ -149,6 +185,7 @@ def todo_from_line(line):
                 done_date=t_done_date,
                 contexts=t_contexts,
                 projects=t_projects,
+                hashtags=t_hashtags,
                 done=t_done)
 
 
@@ -168,19 +205,24 @@ class TODOFile:
     def _recalc(self):
         self.projects = defaultdict(list)
         self.contexts = defaultdict(list)
+        self.hashtags = defaultdict(list)
 
         for t in self._todos:
             for p in t.projects:
                 self.projects[p].append(t)
             for c in t.contexts:
                 self.contexts[c].append(t)
+            for ht in t.hashtags:
+                self.hashtags[ht].append(t)
 
     def summary(self):
-        return ("{}: {} todos, {} projects and "
-                "{} contexts".format(os.path.basename(self.filename),
+        return ("{}: {} todos, {} projects,  "
+                "{} contexts "
+                "and {} tags".format(os.path.basename(self.filename),
                                      len(self._todos),
                                      len(self.projects),
-                                     len(self.contexts)))
+                                     len(self.contexts),
+                                     len(self.hashtags)))
 
     def add_todo(self, todo):
         self._todos.append(todo)

@@ -32,14 +32,16 @@ if __name__ == '__main__':
         ds = datetime.strftime(d, "%A, %B %d: ")
         print(ds + "{} completed todos".format(len(todos)))
         print(80 * "-")
-        todos_by_project = todos_grouped_by(todos, 'projects_string')
-        for p in sorted(todos_by_project.keys()):
-            if p == '':
+        todos_by_datetime = todos_grouped_by(todos, 'done_datetime') #'projects_string')
+        for dt in sorted(todos_by_datetime.keys()):
+            if dt == '':
                 print(" (No Project)")
             else:
-                print(" {}".format(p))
-            proj_todos = todos_by_project[p]
-            print("\n".join(["   {}".format(t.get_string(show_done=False))
-                             for t in proj_todos]))
+                print(" {}".format(dt.strftime("%H:%M")))
+            dt_todos = todos_by_datetime[dt]
+            for t in dt_todos:
+                print("   ", end="")
+                print("{}".format(t.get_string(show_done=False, show_tags=False)))
+
             print()
         print()
