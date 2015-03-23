@@ -100,6 +100,8 @@ class TODO:
     @done.setter
     def done(self, newval):
         if newval:
+            if self.done_date:
+                return
             now = datetime.now()
             self.done_date = datetime.strftime(now, DATE_FMT)
             timestr = datetime.strftime(now, TIME_FMT)
