@@ -17,9 +17,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='todotxt \'DO\' script')
     parser.add_argument('--dir', default=os.environ.get('TODO_DIR', '.'),
                         help="Directory to look for todo.txt files")
-    parser.add_argument("N", type=int,
-                        metavar='line number',
-                        help="line number of todo to edit (starting at 1)")
+    parser.add_argument("N", type=int, nargs='*',
+                        metavar='line number(s)',
+                        help="line numbers of todos to edit (starting at 1)")
 
     opts = parser.parse_args()
 
@@ -27,18 +27,19 @@ if __name__ == '__main__':
 
     todos = todo_file.get_todos()
 
-    num = opts.N - 1
-    if num > len(todos):
-        print("Error: there are only {} todos in {}".format(len(todos),
-                                                            filename))
-        print("they are: \n{}".format(list(map(str, f.get_todos()))))
-        sys.exit(1)
+    for N in opts.N:
+        num = N - 1
+        if num > len(todos):
+            print("Error: there are only {} todos in {}".format(len(todos),
+                                                                filename))
+            print("they are: \n{}".format(list(map(str, f.get_todos()))))
+            sys.exit(1)
 
-    t = todos[num]
-    if t.done:
-        print("Already done!")
-        sys.exit()
+        t = todos[num]
+        if t.done:
+            print("Already done!")
+            sys.exit()
 
-    t.done = True
-    print("done: {}".format(str(t)))
+        t.done = True
+        print("done: {}".format(str(t)))
     todo_file.save()
