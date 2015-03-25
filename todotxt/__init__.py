@@ -76,7 +76,7 @@ class TODO:
         if not show_tags:
             d['htstr'] = ''
         s += "{pstr}{cdstr}{text}{prjstr}{cxstr}{htstr}".format(**d)
-        return s
+        return s.strip()
 
     @property
     def projects_string(self):
