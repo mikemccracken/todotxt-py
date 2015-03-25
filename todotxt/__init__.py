@@ -31,6 +31,10 @@ class TODO:
         self.projects = projects if projects else []
         self.hashtags = hashtags if hashtags else []
 
+    def set_created_now(self):
+        "sets created date to now."
+        self._set_datetime_attr_now('created')
+
     def _get_str_components(self):
         d = {}
         d['donestr'] = "x {} ".format(self.done_date) if self.done_date else ""
@@ -102,21 +106,38 @@ class TODO:
         if newval:
             if self.done_date:
                 return
-            now = datetime.now()
-            self.done_date = datetime.strftime(now, DATE_FMT)
-            timestr = datetime.strftime(now, TIME_FMT)
-            self.hashtags.append("done-{}".format(timestr))
+            self._set_datetime_attr_now('done')
         else:
             self.done_date = None
+
+    def _set_datetime_attr_now(self, attr):
+        now = datetime.now()
+        setattr(self, attr + '_date',
+                datetime.strftime(now, DATE_FMT))
+        timestr = datetime.strftime(now, TIME_FMT)
+        self.hashtags.append("{}-{}".format(attr, timestr))
 
     @property
     def done_datetime(self):
         "returns a datetime instance if the 'done-<TIME>' hashtag exists"
-        if not self.done:
+        return self._datetime_attr('done')
+
+    @property
+    def created_datetime(self):
+        return self._datetime_attr('created')
+
+    def _datetime_attr(self, attrname):
+        """returns a datetime from self.attrname and a hashtag called
+        'attrname-<date>'
+
+        used for attrs 'done' and 'created'
+        """
+        if not getattr(self, attrname):
             return None
         for ht in self.hashtags:
-            if ht.startswith("done-"):
-                return datetime.strptime("{} {}".format(self.done_date,
+            if ht.startswith(attrname + "-"):
+                date_val = getattr(self, attrname + "_date")
+                return datetime.strptime("{} {}".format(date_val,
                                                         ht[5:]),
                                          "{} {}".format(DATE_FMT, TIME_FMT))
 

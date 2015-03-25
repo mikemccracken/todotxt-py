@@ -253,6 +253,7 @@ class ReviewShell(cmd.Cmd):
 
         f = self.all_files[matching_filenames[0]]
         t = todo_from_line(todotxt)
+        t.set_created_now()
         f.add_todo(t)
         self.refresh_current_todos()
 
