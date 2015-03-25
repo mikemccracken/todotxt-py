@@ -38,16 +38,23 @@ if __name__ == '__main__':
         ds = datetime.strftime(d, "%A, %B %d: ")
         print(ds + "{} completed todos".format(len(todos)))
         print(80 * "-")
-        todos_by_datetime = todos_grouped_by(todos, 'done_datetime') #'projects_string')
-        for dt in sorted(todos_by_datetime.keys()):
-            if dt == '':
-                print(" (No Project)")
-            else:
-                print(" {}".format(dt.strftime("%H:%M")))
-            dt_todos = todos_by_datetime[dt]
-            for t in dt_todos:
-                print("   ", end="")
-                print("{}".format(t.get_string(show_done=False, show_tags=False)))
+        if len(todos) == 0:
+            continue
 
-            print()
+        todos_by_hour = defaultdict(list)
+        for t in todos:
+            todos_by_hour[t.done_datetime.hour].append(t)
+
+        hours = sorted(todos_by_hour.keys())
+        start_hour = min(7, hours[0])
+        end_hour = max(17, hours[-1])
+
+        for hour in range(start_hour, end_hour+1):
+            if hour not in todos_by_hour:
+                print("  {:0>2}:00 \N{HORIZONTAL ELLIPSIS}".format(hour % 12))
+            else:
+                for t in todos_by_hour[hour]:
+                    print("  {} {}".format(t.done_datetime.strftime("%I:%M"),
+                        t.get_string(show_done=False, show_tags=False)))
+
         print()
