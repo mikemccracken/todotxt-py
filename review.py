@@ -237,6 +237,9 @@ class ReviewShell(cmd.Cmd):
 
     def do_new(self, rest):
         "Add new todo to file (or file prefix) given as first arg."
+        if len(rest.split(' ', 1)) == 1:
+            print("usage: new <fileprefix> <todotxt>")
+            return
         fileprefix, todotxt = rest.split(' ', 1)
         matching_filenames = [fn for fn in self.all_files.keys()
                               if fn.startswith(fileprefix)]
