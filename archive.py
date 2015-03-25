@@ -30,12 +30,16 @@ if __name__ == '__main__':
         f = TODOFile(fn)
         print("{:<18}: ".format(bfn), end="")
         archived = 0
+        to_delete = []
         for todo in f.get_todos():
             if not todo.done:
                 continue
             done_file.add_todo(todo)
-            f.delete_todo(todo)
+            to_delete.append(todo)
             archived += 1
+        for deltodo in to_delete:
+            f.delete_todo(deltodo)
+
         try:
             done_file.save()
             f.save()
