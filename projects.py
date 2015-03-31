@@ -21,8 +21,4 @@ if __name__ == '__main__':
     pf = ProjectFile(fn)
     pf.save()
     print("saved project list that looked like this:")
-    print(str(pf))
-
-    print("sort tuples like this:")
-    for p in pf._projects.values():
-        print (p._get_sort_tuple(p))
+    print(pf.padded_string(150, draw_dots=True))
