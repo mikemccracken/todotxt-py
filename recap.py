@@ -3,6 +3,7 @@
 import argparse
 from collections import defaultdict
 from datetime import datetime
+from operator import attrgetter
 import os
 import sys
 
@@ -53,7 +54,8 @@ if __name__ == '__main__':
             if hour not in todos_by_hour:
                 print("  {:0>2}:00 \N{HORIZONTAL ELLIPSIS}".format(hour % 12))
             else:
-                for t in todos_by_hour[hour]:
+                for t in sorted(todos_by_hour[hour],
+                                key=attrgetter('done_datetime')):
                     print("  {} {}".format(t.done_datetime.strftime("%I:%M"),
                         t.get_string(show_done=False, show_tags=False)))
 
