@@ -107,9 +107,13 @@ class ReviewShell(cmd.Cmd):
         self.current_todos = sorted(self.current_file.get_todos())
 
     def goto_next_file(self):
-        "returns False if no next file exists."
+        """returns False if no next file exists.
+
+        leaves current_file_index pointing at a valid file
+        """
         self.current_file_index += 1
         if self.current_file_index >= len(self.to_review):
+            self.current_file_index -= 1
             return False
 
         self.refresh_current_todos()
