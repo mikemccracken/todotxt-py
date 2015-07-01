@@ -78,6 +78,14 @@ class TODO:
         s += "{pstr}{cdstr}{text}{prjstr}{cxstr}{htstr}".format(**d)
         return s.strip()
 
+    def get_string_excluding(self, excludes):
+        d = self._get_str_components()
+        s = ""
+        for k in excludes:
+            d[k] = ''
+        s = "{donestr}{pstr}{cdstr}{text}{prjstr}{cxstr}{htstr}".format(**d)
+        return s.strip()
+
     @property
     def projects_string(self):
         d = self._get_str_components()

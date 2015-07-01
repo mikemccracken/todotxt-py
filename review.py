@@ -13,7 +13,7 @@ readline.parse_and_bind("TAB: complete")
 #libedit style
 #readline.parse_and_bind("bind -e")
 
-from todotxt import TODOFile, todo_from_line
+from todotxt import TODO, TODOFile, todo_from_line
 
 IDXCHAR = "\N{ELECTRIC LIGHT BULB}  "
 
@@ -120,7 +120,7 @@ class ReviewShell(cmd.Cmd):
         self.current_todo_index = 0
         return True
 
-    def show_next(self, increment=True):
+    def show_next(self, increment=True, ):
         "prints next todo. returns false if at end."
         if increment:
             self.current_todo_index += 1
@@ -206,10 +206,10 @@ class ReviewShell(cmd.Cmd):
                 return None
         return None
 
-    def do_edit(self, rest):
-        "Edit the todo"
+    def edit_todo_string(self, todo_string):
+        "Edit a string representing a todo, return edited string"
         def hook():
-            readline.insert_text(str(self.current_todo))
+            readline.insert_text(todo_string)
         readline.set_startup_hook(hook)
         old_delims = readline.get_completer_delims()
         new_delims = old_delims.replace('@', '')
@@ -221,6 +221,11 @@ class ReviewShell(cmd.Cmd):
         readline.set_startup_hook(None)
         readline.set_completer(None)
         readline.set_completer_delims(old_delims)
+        return newval
+
+    def do_edit(self, rest):
+        "Edit the current todo"
+        newval = self.edit_todo_string(str(self.current_todo))
         if newval != str(self.current_todo):
             self.dirty = True
             newtodo = todo_from_line(newval)
@@ -308,6 +313,18 @@ class ReviewShell(cmd.Cmd):
     def do_now(self, rest):
         "Move current todo to todo.txt"
         self.move_current_to('todo.txt')
+
+    def do_first(self, rest):
+        "Add and edit a new todo in the same project that needs to be done before the current one."
+        c = self.current_todo
+        todostr = c.get_string_excluding(['text', 'cdstr'])
+        c.priority = None
+        text = " {}".format(rest)
+        newval = self.edit_todo_string(todostr + text)
+        self.dirty = True
+        newtodo = todo_from_line(newval)
+        self.current_file.add_todo(newtodo)
+        self.show_next()
 
     def do_quit(self, rest):
         "Quit"
