@@ -240,9 +240,32 @@ class ReviewShell(cmd.Cmd):
         self.current_todo.done = True
         self.show_todo(self.current_todo)
         print()
+        n_next = self.show_upcoming(self.current_todo)
+        if n_next == 0 and len(self.current_todo.projects) > 0:
+            yn = input("No next actions for '{}'. "
+                       "Add a new one? [y]/n ".format(self.current_todo.projects))
+            if yn in ['Y', 'y', '']:
+                self.add_related_todo(self.current_todo, "")
         self.dirty = True
         self.show_next()
     do_x = do_done
+
+    def show_upcoming(self, todo):
+        "show what's next in this todo's projects"
+        num_upcoming = 0
+        if len(todo.projects) == 0:
+            return num_upcoming
+
+        print("\nUpcoming in related projects:")
+
+        for project in todo.projects:
+            print("# Project: {}".format(project))
+            upcoming_todos = [t for t in self.current_file.get_todos()
+                              if project in t.projects and t.done == False]
+            print("\n## ".join(sorted(map(str, upcoming_todos))))
+            print("\n\n")
+            num_upcoming == len(upcoming_todos)
+        return num_upcoming
 
     def do_new(self, rest):
         "Add new todo to file (or file prefix) given as first arg."
@@ -317,19 +340,22 @@ class ReviewShell(cmd.Cmd):
     def do_first(self, rest):
         "Add and edit a new todo in the same project that needs to be done before the current one."
         c = self.current_todo
-        todostr = c.get_string_excluding(['text', 'cdstr'])
         c.priority = None
+        self.add_related_todo(c, rest)
+        self.show_next()
+
+    def add_related_todo(self, t, rest):
+        todostr = t.get_string_excluding(['text', 'cdstr'])
         text = " {}".format(rest)
         newval = self.edit_todo_string(todostr + text)
         self.dirty = True
         newtodo = todo_from_line(newval)
         self.current_file.add_todo(newtodo)
-        self.show_next()
 
     def do_quit(self, rest):
         "Quit"
         if self.dirty:
-            yn = input("Save changes? [y]/n")
+            yn = input("Save changes? [y]/n ")
             if yn in ['Y', 'y', '']:
                 print("Saving...")
                 self.do_save(None)
