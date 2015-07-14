@@ -237,15 +237,16 @@ class ReviewShell(cmd.Cmd):
 
     def do_done(self, rest):
         "Mark todo as done."
-        self.current_todo.done = True
-        self.show_todo(self.current_todo)
-        print()
         n_next = self.show_upcoming(self.current_todo)
         if n_next == 0 and len(self.current_todo.projects) > 0:
             yn = input("No next actions for '{}'. "
                        "Add a new one? [y]/n ".format(self.current_todo.projects))
             if yn in ['Y', 'y', '']:
                 self.add_related_todo(self.current_todo, "")
+
+        self.current_todo.done = True
+        self.show_todo(self.current_todo)
+        print()
         self.dirty = True
         self.show_next()
     do_x = do_done
@@ -259,12 +260,14 @@ class ReviewShell(cmd.Cmd):
         print("\nUpcoming in related projects:")
 
         for project in todo.projects:
-            print("# Project: {}".format(project))
+            print("  \N{NOTEBOOK}  {}".format(project))
             upcoming_todos = [t for t in self.current_file.get_todos()
-                              if project in t.projects and t.done == False]
-            print("\n## ".join(sorted(map(str, upcoming_todos))))
-            print("\n\n")
-            num_upcoming == len(upcoming_todos)
+                              if project in t.projects and t.done == False
+                              and t is not todo]
+            for ut in upcoming_todos:
+                print("  \N{BALLOT BOX} " + str(ut))
+            print("\n")
+            num_upcoming += len(upcoming_todos)
         return num_upcoming
 
     def do_new(self, rest):
@@ -345,12 +348,12 @@ class ReviewShell(cmd.Cmd):
         self.show_next()
 
     def add_related_todo(self, t, rest):
-        todostr = t.get_string_excluding(['text', 'cdstr'])
+        todostr = t.get_string_excluding(['text', 'cdstr', 'donestr'])
         text = " {}".format(rest)
         newval = self.edit_todo_string(todostr + text)
-        self.dirty = True
         newtodo = todo_from_line(newval)
         self.current_file.add_todo(newtodo)
+        self.dirty = True
 
     def do_quit(self, rest):
         "Quit"
